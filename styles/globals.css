@@ -1,0 +1,60 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Фон с плавным многоцветным градиентом */
+.bg-gradient-animate {
+  background: linear-gradient(-45deg, #0f172a, #1e1b4b, #3b0764, #312e81, #0f172a);
+  background-size: 500% 500%;
+}
+@keyframes gradient-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.animate-gradient-flow {
+  animation: gradient-flow 18s ease infinite;
+}
+
+/* Частицы */
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: rgba(255,255,255,0.3);
+  border-radius: 50%;
+  animation: particle-float linear infinite;
+}
+@keyframes particle-float {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  50% { transform: translateY(-50px) scale(1.3); opacity: 0.6; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+/* Анимации появления */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeInUp { animation: fadeInUp 1s forwards; }
+.animate-fadeInUp.delay-200 { animation-delay: 0.2s; }
+.animate-fadeInUp.delay-300 { animation-delay: 0.3s; }
+.animate-fadeInUp.delay-500 { animation-delay: 0.5s; }
+.animate-fadeInUp.delay-700 { animation-delay: 0.7s; }
+
+/* Логотип масштаб */
+@keyframes scaleIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+.animate-scaleIn { animation: scaleIn 1.3s ease forwards; }
+
+/* Неон */
+.drop-shadow-neon {
+  filter: drop-shadow(0 0 12px rgba(255,255,255,0.5))
+          drop-shadow(0 0 24px rgba(236,72,153,0.4));
+}
+.shadow-neon {
+  box-shadow: 0 0 20px rgba(236,72,153,0.6),
+              0 0 40px rgba(6,182,212,0.3);
+}
