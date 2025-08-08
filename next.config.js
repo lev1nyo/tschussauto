@@ -4,7 +4,7 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: '/:path*',
+        source: '/:path((?!sitemap\\.xml|sitemap-0\\.xml|robots\\.txt).*)',
         has: [
           {
             type: 'host',
