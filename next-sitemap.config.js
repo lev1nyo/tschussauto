@@ -1,8 +1,6 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-  siteUrl: 'https://xn--tschssauto-deb.de', // 🔁 Punycode обязательно
+  siteUrl: 'https://tschussauto.de',
   generateRobotsTxt: true,
-  generateIndexSitemap: false,
-  sitemapBaseFileName: 'sitemap',
   exclude: ['/api/*'],
 };

@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Host
-Host: https://xn--tschssauto-deb.de
+Host: https://tschussauto.de
 
 # Sitemaps
-Sitemap: https://xn--tschssauto-deb.de/sitemap.xml
+Sitemap: https://tschussauto.de/sitemap.xml
