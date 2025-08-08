@@ -1,9 +1,4 @@
-# *
 User-agent: *
 Allow: /
 
-# Host
-Host: https://tschüssauto.de
-
-# Sitemaps
-Sitemap: https://tschüssauto.de/sitemap.xml
+Sitemap: https://xn--tschssauto-deb.de/sitemap.xml
