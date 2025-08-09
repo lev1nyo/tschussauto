@@ -1,4 +1,4 @@
-import Head from 'next/head';
+import Head from 'next/head'
 import { useState, useEffect } from "react";
 import AdditionalQuestions from "../components/AdditionalQuestions";
 
@@ -14,8 +14,8 @@ export default function Quiz() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [agreement, setAgreement] = useState(false);
-
   const [showAdditional, setShowAdditional] = useState(false);
+
   const stepsCount = 9;
 
   useEffect(() => {
@@ -86,8 +86,12 @@ Zustand: ${data.zustand}
 
   return (
     <>
-      {/* Каноникал для /quiz */}
       <Head>
+        <title>Autoankauf Quiz – Jetzt Fahrzeugbewertung starten</title>
+        <meta
+          name="description"
+          content="Beantworte ein paar Fragen zu deinem Auto und erhalte sofort ein Angebot. Schnell, einfach und transparent."
+        />
         <link rel="canonical" href="https://tschussauto.de/quiz" />
       </Head>
 

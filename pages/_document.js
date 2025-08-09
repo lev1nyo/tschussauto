@@ -1,22 +1,20 @@
-// pages/_document.js
-import { Html, Head, Main, NextScript } from 'next/document'
+import { Html, Head, Main, NextScript } from 'next/document';
 
 export default function Document() {
   return (
     <Html lang="de">
       <Head>
-        {/* Google Fonts */}
+        {/* Подключение шрифта */}
         <link
           href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
-        {/* Canonical (базовый для домена) */}
-        <link rel="canonical" href="https://tschussauto.de" />
+        {/* Здесь мы убрали глобальный canonical, так как он теперь на каждой странице индивидуально */}
       </Head>
       <body>
         <Main />
         <NextScript />
       </body>
     </Html>
-  )
+  );
 }
