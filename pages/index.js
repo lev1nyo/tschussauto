@@ -26,6 +26,8 @@ export default function Home() {
           name="description"
           content="Autoankauf in Bayern mit Sofortzahlung. Verkaufen Sie Ihr Auto schnell und unkompliziert. Jetzt kostenlose Online-Bewertung starten!"
         />
+        {/* Каноникал для главной */}
+        <link rel="canonical" href="https://tschussauto.de/" />
       </Head>
 
       <main className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-animate">

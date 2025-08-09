@@ -26,6 +26,10 @@ export default function Success() {
           name="description"
           content="Ihre Auto-Bewertung wurde erfolgreich übermittelt. Unser Team wird sich umgehend mit Ihnen in Verbindung setzen."
         />
+        {/* Каноникал для /success */}
+        <link rel="canonical" href="https://tschussauto.de/success" />
+        {/* Запрет индексации этой страницы */}
+        <meta name="robots" content="noindex, nofollow" />
       </Head>
 
       <main className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-animate">
