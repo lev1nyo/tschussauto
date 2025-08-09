@@ -4,12 +4,9 @@ export default function Document() {
   return (
     <Html lang="de">
       <Head>
-        {/* Подключение шрифта */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-        {/* Здесь мы убрали глобальный canonical, так как он теперь на каждой странице индивидуально */}
+        <meta charSet="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {/* Каноникал убрали, теперь он только в конкретных страницах */}
       </Head>
       <body>
         <Main />
