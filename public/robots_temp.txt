@@ -1,9 +1,0 @@
-# *
-User-agent: *
-Allow: /
-
-# Host
-Host: https://xn--tschssauto-deb.de
-
-# Sitemaps
-Sitemap: https://xn--tschssauto-deb.de/sitemap.xml
