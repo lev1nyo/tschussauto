@@ -5,13 +5,24 @@ export default function Home() {
   const siteUrl = 'https://tschussauto.de';
   const ogImage = `${siteUrl}/og-image.jpg`; // картинка 1200x630
 
-  // JSON-LD: AutoDealer
+    // JSON-LD: AutoDealer (расширено для Rich Results)
   const localBusinessJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'AutoDealer',
     '@id': `${siteUrl}#autodealer`,
     name: 'TschüssAuto',
-    url: siteUrl,
+    url: `${siteUrl}/`,
+    image: `${siteUrl}/og-image.jpg`,            // можно указать логотип или общий OG
+    telephone: '+49-171-1012349',               // ← ЗАМЕНИ на реальный номер (формат E.164)
+    address: {                                  // ← ЗАМЕНИ на реальный адрес
+      '@type': 'PostalAddress',
+      streetAddress: 'Weißkopfstraße 1',
+      postalCode: '86343',
+      addressLocality: 'Königsbrunn',
+      addressCountry: 'DE'
+    },
+    openingHours: 'Mo-Fr 09:00-18:00',          // ← при необходимости скорректируй
+    priceRange: '€€€',
     areaServed: 'Augsburg und Bayern (Umkreis 80 km)',
     potentialAction: {
       '@type': 'ContactAction',
@@ -19,6 +30,7 @@ export default function Home() {
       name: 'Kostenlose Online-Bewertung starten'
     }
   };
+
 
   const faqJsonLd = {
     '@context': 'https://schema.org',
