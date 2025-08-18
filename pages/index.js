@@ -5,23 +5,23 @@ export default function Home() {
   const siteUrl = 'https://tschussauto.de';
   const ogImage = `${siteUrl}/og-image.jpg`; // картинка 1200x630
 
-    // JSON-LD: AutoDealer (расширено для Rich Results)
+  // JSON-LD: AutoDealer (расширено для Rich Results)
   const localBusinessJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'AutoDealer',
     '@id': `${siteUrl}#autodealer`,
     name: 'TschüssAuto',
     url: `${siteUrl}/`,
-    image: `${siteUrl}/og-image.jpg`,            // можно указать логотип или общий OG
-    telephone: '+49-171-1012349',               // ← ЗАМЕНИ на реальный номер (формат E.164)
-    address: {                                  // ← ЗАМЕНИ на реальный адрес
+    image: `${siteUrl}/og-image.jpg`,
+    telephone: '+49-171-1012349',
+    address: {
       '@type': 'PostalAddress',
       streetAddress: 'Weißkopfstraße 1',
       postalCode: '86343',
       addressLocality: 'Königsbrunn',
       addressCountry: 'DE'
     },
-    openingHours: 'Mo-Fr 09:00-18:00',          // ← при необходимости скорректируй
+    openingHours: 'Mo-Fr 09:00-18:00',
     priceRange: '€€€',
     areaServed: 'Augsburg und Bayern (Umkreis 80 km)',
     potentialAction: {
@@ -30,7 +30,6 @@ export default function Home() {
       name: 'Kostenlose Online-Bewertung starten'
     }
   };
-
 
   const faqJsonLd = {
     '@context': 'https://schema.org',
@@ -158,7 +157,8 @@ export default function Home() {
             </p>
           </section>
 
-          <section className="mt-10 text-left max-w-2xl mx-auto">
+          {/* FAQ — добавил id, чтобы использовать как sitelink в Ads */}
+          <section id="faq" className="mt-10 text-left max-w-2xl mx-auto">
             <details className="mb-3 rounded-lg bg-white/5 p-4 text-gray-100">
               <summary className="cursor-pointer font-semibold">Kostet die Fahrzeugbewertung etwas?</summary>
               <p className="mt-2 text-sm text-gray-300">
@@ -178,6 +178,32 @@ export default function Home() {
               </p>
             </details>
           </section>
+
+          {/* === SEO-блок: города в радиусе ~50 км (>10k жителей) === */}
+          <section
+            id="service-areas"
+            className="mt-10 max-w-2xl mx-auto text-left text-gray-400 text-[13px] leading-7 border-t border-white/10 pt-8"
+            aria-label="Autoankauf in Augsburg & Umgebung"
+          >
+            <details className="group">
+              <summary className="cursor-pointer list-none font-semibold text-gray-200 hover:text-white flex items-center gap-2">
+                <span>Autoankauf in Augsburg & Umgebung (≈50&nbsp;km)</span>
+                <span className="ml-1 text-xs opacity-70 group-open:hidden">– mehr anzeigen</span>
+                <span className="ml-1 text-xs opacity-70 hidden group-open:inline">– weniger anzeigen</span>
+              </summary>
+              <div className="mt-3 space-y-3">
+                <p>
+                  Wir kaufen Ihr Auto nicht nur in <strong>Augsburg</strong>, sondern auch in der Region:
+                  <strong> Friedberg</strong>, <strong>Königsbrunn</strong>, <strong>Neusäß</strong>, <strong>Gersthofen</strong>, <strong>Bobingen</strong>, <strong>Stadtbergen</strong>, <strong>Kissing</strong>, <strong>Mering</strong>, <strong>Diedorf</strong>, <strong>Schwabmünchen</strong>, <strong>Aichach</strong>, <strong>Landsberg am Lech</strong>, <strong>Donauwörth</strong>, <strong>Mindelheim</strong>, <strong>Meitingen</strong>, <strong>Kaufering</strong>.
+                </p>
+                <p>
+                  Schnell, fair & sicher verkaufen – mit kostenloser Online-Bewertung und Auszahlung in 24&nbsp;Stunden. Starten Sie jetzt die{' '}
+                  <a className="underline decoration-dotted text-gray-200 hover:text-white" href="/quiz">kostenlose Bewertung</a>.
+                </p>
+              </div>
+            </details>
+          </section>
+          {/* === /SEO-блок === */}
         </div>
       </main>
     </>
