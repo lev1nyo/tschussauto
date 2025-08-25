@@ -1,13 +1,50 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-export default function AdditionalQuestions() {
+export default function AdditionalQuestions({ onProgress, onComplete }) {
   const [step, setStep] = useState(1);
   const [answers, setAnswers] = useState({});
 
   const totalSteps = 4;
 
+  // ==== Restore persisted answers ====
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem("quizAdditional");
+      if (saved) {
+        const obj = JSON.parse(saved);
+        if (obj && typeof obj === "object") {
+          setAnswers(obj.answers ?? {});
+          setStep(Number(obj.step) || 1);
+        }
+      }
+    } catch {}
+  }, []);
+
+  // ==== Persist on change ====
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(
+        "quizAdditional",
+        JSON.stringify({ step, answers })
+      );
+    } catch {}
+  }, [step, answers]);
+
+  // ==== Smooth scroll to top on step change ====
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [step]);
+
+  // ==== Report progress to parent: 0..1 over whole part 3 ====
+  useEffect(() => {
+    const fraction = Math.max(0, Math.min(1, (step - 1) / totalSteps));
+    onProgress?.(fraction);
+  }, [step, totalSteps, onProgress]);
+
   const handleSelect = (name, value) => {
-    setAnswers({ ...answers, [name]: value });
+    setAnswers((prev) => ({ ...prev, [name]: value }));
   };
 
   const sendAdditionalToTelegram = async (data) => {
@@ -54,11 +91,21 @@ Preisvorstellung: ${data.preis || "nicht angegeben"}
 
   const handleNext = async () => {
     if (step < totalSteps) {
-      setStep(step + 1);
+      setStep((s) => s + 1);
     } else {
+      // финальный шаг
       await sendAdditionalToTelegram(answers);
+      onProgress?.(1);
+      onComplete?.();
+      try {
+        sessionStorage.removeItem("quizAdditional");
+      } catch {}
       window.location.href = "/success";
     }
+  };
+
+  const handleBack = () => {
+    setStep((s) => Math.max(1, s - 1));
   };
 
   const isSelected = (name, value) => answers[name] === value;
@@ -102,21 +149,36 @@ Preisvorstellung: ${data.preis || "nicht angegeben"}
       );
     }
     if (step === 4) {
-      return (
+      const vinOk =
         answers.vin &&
         answers.vin.length === 17 &&
+        !/[IOQ]/i.test(answers.vin);
+      const plzOk = answers.plz && String(answers.plz).length >= 5;
+      return (
+        vinOk &&
         answers.erstzulassung_monat &&
         answers.erstzulassung_jahr &&
-        answers.plz &&
-        answers.plz.length >= 5
+        plzOk
       );
     }
     return false;
   };
 
+  const TopBar = () => (
+    <div className="flex items-center justify-between text-xs text-gray-300 mb-3">
+      <span>
+        Schritt {step} / {totalSteps}
+      </span>
+      <span>{Math.round((step / totalSteps) * 100)}%</span>
+    </div>
+  );
+
   return (
     <div className="relative z-20 w-full max-w-2xl bg-white/5 backdrop-blur-md rounded-2xl p-8 shadow-neon text-white animate-fadeInUp">
-      {/* Прогресс-бар */}
+      <TopBar />
+
+      {/* Внутренний прогресс (чисто визуальный для части 3).
+          Можно оставить как было (step/totalSteps), а родителю уходит (step-1)/totalSteps. */}
       <div className="w-full bg-white/10 rounded-full h-3 mb-8 overflow-hidden">
         <div
           className="bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 h-3 transition-all duration-500 ease-in-out"
@@ -245,17 +307,28 @@ Preisvorstellung: ${data.preis || "nicht angegeben"}
             </div>
           </div>
 
-          <button
-            onClick={handleNext}
-            disabled={!isStepValid()}
-            className={`relative group px-8 py-3 rounded-lg font-semibold shadow-neon w-full mt-6 ${
-              isStepValid()
-                ? "bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 hover:scale-105"
-                : "bg-gray-500 text-gray-300 cursor-not-allowed"
-            }`}
-          >
-            Weiter
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={handleBack}
+              type="button"
+              className="px-5 py-3 rounded-lg bg-white/10 hover:bg-white/20"
+              disabled={step === 1}
+            >
+              Zurück
+            </button>
+            <button
+              onClick={handleNext}
+              type="button"
+              disabled={!isStepValid()}
+              className={`relative group px-8 py-3 rounded-lg font-semibold shadow-neon flex-1 ${
+                isStepValid()
+                  ? "bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 hover:scale-105"
+                  : "bg-gray-500 text-gray-300 cursor-not-allowed"
+              }`}
+            >
+              Weiter
+            </button>
+          </div>
         </div>
       )}
 
@@ -341,17 +414,27 @@ Preisvorstellung: ${data.preis || "nicht angegeben"}
             </div>
           </div>
 
-          <button
-            onClick={handleNext}
-            disabled={!isStepValid()}
-            className={`relative group px-8 py-3 rounded-lg font-semibold shadow-neon w-full mt-6 ${
-              isStepValid()
-                ? "bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 hover:scale-105"
-                : "bg-gray-500 text-gray-300 cursor-not-allowed"
-            }`}
-          >
-            Weiter
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={handleBack}
+              type="button"
+              className="px-5 py-3 rounded-lg bg-white/10 hover:bg-white/20"
+            >
+              Zurück
+            </button>
+            <button
+              onClick={handleNext}
+              type="button"
+              disabled={!isStepValid()}
+              className={`relative group px-8 py-3 rounded-lg font-semibold shadow-neon flex-1 ${
+                isStepValid()
+                  ? "bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 hover:scale-105"
+                  : "bg-gray-500 text-gray-300 cursor-not-allowed"
+              }`}
+            >
+              Weiter
+            </button>
+          </div>
         </div>
       )}
 
@@ -478,17 +561,27 @@ Preisvorstellung: ${data.preis || "nicht angegeben"}
             </div>
           </div>
 
-          <button
-            onClick={handleNext}
-            disabled={!isStepValid()}
-            className={`relative group px-8 py-3 rounded-lg font-semibold shadow-neon w-full mt-6 ${
-              isStepValid()
-                ? "bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 hover:scale-105"
-                : "bg-gray-500 text-gray-300 cursor-not-allowed"
-            }`}
-          >
-            Weiter
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={handleBack}
+              type="button"
+              className="px-5 py-3 rounded-lg bg-white/10 hover:bg-white/20"
+            >
+              Zurück
+            </button>
+            <button
+              onClick={handleNext}
+              type="button"
+              disabled={!isStepValid()}
+              className={`relative group px-8 py-3 rounded-lg font-semibold shadow-neon flex-1 ${
+                isStepValid()
+                  ? "bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 hover:scale-105"
+                  : "bg-gray-500 text-gray-300 cursor-not-allowed"
+              }`}
+            >
+              Weiter
+            </button>
+          </div>
         </div>
       )}
 
@@ -497,46 +590,46 @@ Preisvorstellung: ${data.preis || "nicht angegeben"}
         <div className="space-y-6">
           <h2 className="text-xl font-bold drop-shadow-neon">Letzte Angaben</h2>
 
-{/* VIN */}
-<div>
-  <p className="mb-2">
-    Fahrgestellnummer (VIN) <span className="text-red-500">*</span>
-  </p>
-  <input
-    type="text"
-    minLength={17}
-    maxLength={17}
-    value={answers.vin || ""}
-    onChange={(e) => {
-      // всегда записываем в верхнем регистре
-      handleSelect("vin", e.target.value.toUpperCase());
-    }}
-    className={`w-full bg-white/10 text-white rounded p-3 focus:outline-none focus:ring-2 focus:ring-fuchsia-400 ${
-      answers.vin &&
-      (answers.vin.length !== 17 || /[IOQ]/i.test(answers.vin))
-        ? "border border-red-500"
-        : ""
-    }`}
-    placeholder="17-stellige VIN eingeben"
-    required
-  />
+          {/* VIN */}
+          <div>
+            <p className="mb-2">
+              Fahrgestellnummer (VIN) <span className="text-red-500">*</span>
+            </p>
+            <input
+              type="text"
+              minLength={17}
+              maxLength={17}
+              value={answers.vin || ""}
+              onChange={(e) => {
+                const raw = e.target.value.toUpperCase();
+                handleSelect("vin", raw);
+              }}
+              className={`w-full bg-white/10 text-white rounded p-3 focus:outline-none focus:ring-2 focus:ring-fuchsia-400 ${
+                answers.vin &&
+                (answers.vin.length !== 17 || /[IOQ]/i.test(answers.vin))
+                  ? "border border-red-500"
+                  : ""
+              }`}
+              placeholder="17-stellige VIN eingeben"
+              required
+            />
 
-  {/* Ошибка: длина ≠ 17 */}
-  {answers.vin && answers.vin.length !== 17 && (
-    <p className="text-sm text-red-400 mt-1">
-      Die VIN muss genau 17 Zeichen enthalten.
-    </p>
-  )}
+            {/* Ошибка: длина ≠ 17 */}
+            {answers.vin && answers.vin.length !== 17 && (
+              <p className="text-sm text-red-400 mt-1">
+                Die VIN muss genau 17 Zeichen enthalten.
+              </p>
+            )}
 
-  {/* Ошибка: запрещённые символы */}
-  {answers.vin && /[IOQ]/i.test(answers.vin) && (
-    <p className="text-sm text-red-400 mt-1">
-      Die Zeichen <strong>I</strong>, <strong>O</strong> und <strong>Q</strong> sind im VIN-Code nicht erlaubt,
-      um Verwechslungen mit den Ziffern <strong>1</strong> und <strong>0</strong> zu vermeiden.
-    </p>
-  )}
-</div>
-
+            {/* Ошибка: запрещённые символы */}
+            {answers.vin && /[IOQ]/i.test(answers.vin) && (
+              <p className="text-sm text-red-400 mt-1">
+                Die Zeichen <strong>I</strong>, <strong>O</strong> und{" "}
+                <strong>Q</strong> sind im VIN-Code nicht erlaubt, um Verwechslungen
+                mit den Ziffern <strong>1</strong> und <strong>0</strong> zu vermeiden.
+              </p>
+            )}
+          </div>
 
           {/* Erstzulassung */}
           <div>
@@ -551,20 +644,7 @@ Preisvorstellung: ${data.preis || "nicht angegeben"}
                 required
               >
                 <option value="">Monat</option>
-                {[
-                  "01",
-                  "02",
-                  "03",
-                  "04",
-                  "05",
-                  "06",
-                  "07",
-                  "08",
-                  "09",
-                  "10",
-                  "11",
-                  "12",
-                ].map((m) => (
+                {["01","02","03","04","05","06","07","08","09","10","11","12"].map((m) => (
                   <option key={m}>{m}</option>
                 ))}
               </select>
@@ -595,16 +675,20 @@ Preisvorstellung: ${data.preis || "nicht angegeben"}
               type="text"
               minLength={5}
               value={answers.plz || ""}
-              onChange={(e) => handleSelect("plz", e.target.value)}
+              onChange={(e) => {
+                // Разрешим вводить только цифры (необязательно, но удобно)
+                const onlyDigits = e.target.value.replace(/\D+/g, "");
+                handleSelect("plz", onlyDigits);
+              }}
               className={`w-full bg-white/10 text-white rounded p-3 focus:outline-none focus:ring-2 focus:ring-fuchsia-400 ${
-                answers.plz && answers.plz.length < 5
+                answers.plz && String(answers.plz).length < 5
                   ? "border border-red-500"
                   : ""
               }`}
               placeholder="z.B. 86150"
               required
             />
-            {answers.plz && answers.plz.length < 5 && (
+            {answers.plz && String(answers.plz).length < 5 && (
               <p className="text-sm text-red-400 mt-1">
                 Die Postleitzahl muss mindestens 5 Zeichen enthalten.
               </p>
@@ -633,18 +717,27 @@ Preisvorstellung: ${data.preis || "nicht angegeben"}
             />
           </div>
 
-          {/* Кнопка */}
-          <button
-            onClick={handleNext}
-            disabled={!isStepValid()}
-            className={`relative group px-8 py-3 rounded-lg font-semibold shadow-neon w-full mt-6 ${
-              isStepValid()
-                ? "bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 hover:scale-105"
-                : "bg-gray-500 text-gray-300 cursor-not-allowed"
-            }`}
-          >
-            Senden
-          </button>
+          <div className="flex gap-3">
+            <button
+              onClick={handleBack}
+              type="button"
+              className="px-5 py-3 rounded-lg bg-white/10 hover:bg-white/20"
+            >
+              Zurück
+            </button>
+            <button
+              onClick={handleNext}
+              type="button"
+              disabled={!isStepValid()}
+              className={`relative group px-8 py-3 rounded-lg font-semibold shadow-neon flex-1 ${
+                isStepValid()
+                  ? "bg-gradient-to-r from-fuchsia-500 via-purple-500 to-cyan-400 hover:scale-105"
+                  : "bg-gray-500 text-gray-300 cursor-not-allowed"
+              }`}
+            >
+              Senden
+            </button>
+          </div>
         </div>
       )}
     </div>
