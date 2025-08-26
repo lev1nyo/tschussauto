@@ -9,6 +9,8 @@ export default function Quiz() {
   const [year, setYear] = useState("");
   const [fuel, setFuel] = useState("");
   const [getriebe, setGetriebe] = useState("");
+  const [bodyType, setBodyType] = useState("");   // ✅ кузов
+  const [doors, setDoors] = useState("");         // ✅ двери
   const [km, setKm] = useState("");
   const [unfall, setUnfall] = useState("");
   const [zustand, setZustand] = useState("");
@@ -29,6 +31,8 @@ export default function Quiz() {
   const yearRef = useRef(null);
   const fuelRef = useRef(null);
   const getriebeRef = useRef(null);
+  const bodyTypeRef = useRef(null);   // ✅
+  const doorsRef = useRef(null);      // ✅
   const kmRef = useRef(null);
   const unfallRef = useRef(null);
   const zustandRef = useRef(null);
@@ -59,6 +63,8 @@ export default function Quiz() {
         setYear(p.year ?? "");
         setFuel(p.fuel ?? "");
         setGetriebe(p.getriebe ?? "");
+        setBodyType(p.bodyType ?? "");   // ✅
+        setDoors(p.doors ?? "");         // ✅
         setKm(p.km ?? "");
         setUnfall(p.unfall ?? "");
         setZustand(p.zustand ?? "");
@@ -74,13 +80,15 @@ export default function Quiz() {
 
   useEffect(() => {
     if (!hydratedRef.current) return;
-    const payload = { brand, model, year, fuel, getriebe, km, unfall, zustand, email, phone, agreement };
+    const payload = {
+      brand, model, year, fuel, getriebe, bodyType, doors, km, unfall, zustand, email, phone, agreement
+    }; // ✅ сохраняем новые поля
     try {
       const json = JSON.stringify(payload);
       sessionStorage.setItem('quizProgress', json);
       localStorage.setItem('quizProgress', json);
     } catch {}
-  }, [brand, model, year, fuel, getriebe, km, unfall, zustand, email, phone, agreement]);
+  }, [brand, model, year, fuel, getriebe, bodyType, doors, km, unfall, zustand, email, phone, agreement]);
 
   const isValidEmail = (v) => {
     if (!v) return false;
@@ -118,6 +126,8 @@ Modell: ${data.model}
 Erstzulassung: ${data.year}
 Kraftstoff: ${data.fuel}
 Getriebe: ${data.getriebe}
+Karosserie: ${data.bodyType}
+Türen: ${data.doors}
 Kilometerstand: ${data.km}
 Unfallfrei: ${data.unfall}
 Zustand: ${data.zustand}
@@ -153,13 +163,13 @@ Zustand: ${data.zustand}
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!agreement) return;
-    await sendToTelegram({ brand, model, year, fuel, getriebe, km, unfall, zustand, email, phone });
+    await sendToTelegram({ brand, model, year, fuel, getriebe, bodyType, doors, km, unfall, zustand, email, phone });
     try {
       sessionStorage.removeItem('quizProgress');
       localStorage.removeItem('quizProgress');
     } catch {}
     setShowAdditional(true);
-    setAdditionalFraction(0);
+    setAdditionalFraction(0); // начинаем третью часть с 0%
   };
 
   // прогресс
@@ -169,33 +179,41 @@ Zustand: ${data.zustand}
     Boolean(year),
     Boolean(fuel),
     Boolean(getriebe),
+    Boolean(bodyType), // ✅
+    Boolean(doors),    // ✅
     Boolean(km),
     Boolean(unfall),
     Boolean(zustand),
   ];
   const part1DoneCount = part1Fields.filter(Boolean).length;
-  const part1Total = 8;
+  const part1Total = 10; // ✅ было 8 → стало 10
   const part1Done = part1DoneCount === part1Total;
 
   const part2Fields = [ isValidEmail(email), Boolean(agreement) ];
   const part2DoneCount = part2Fields.filter(Boolean).length;
   const part2Total = 2;
 
+  // равные веса по секциям: 33 / 33 / 34
   const WEIGHT1 = 33;
   const WEIGHT2 = 33;
   const WEIGHT3 = 34;
 
   const progressPercent = (() => {
+    // Часть 1: 0..33%
     if (!part1Done) {
       return Math.round((part1DoneCount / part1Total) * WEIGHT1);
     }
+    // Часть 2: 33..66%
     if (!showAdditional) {
       return Math.round(WEIGHT1 + (part2DoneCount / part2Total) * WEIGHT2);
     }
+    // Часть 3: 66..100%, но растём постепенно по additionalFraction (0..1)
     const p = WEIGHT1 + WEIGHT2 + (Math.max(0, Math.min(1, additionalFraction)) * WEIGHT3);
+    // Не позволяем перескакивать на 100%, пока не конец
     return Math.min(99, Math.round(p));
   })();
 
+  // Текущий номер секции: 1..3
   const currentSection = showAdditional ? 3 : (part1Done ? 2 : 1);
 
   return (
@@ -328,7 +346,7 @@ Zustand: ${data.zustand}
                   <label className="block mb-2 font-semibold drop-shadow-neon">Getriebe</label>
                   <select
                     value={getriebe}
-                    onChange={(e) => { setGetriebe(e.target.value); setTimeout(() => scrollToRef(kmRef), 100); }}
+                    onChange={(e) => { setGetriebe(e.target.value); setTimeout(() => scrollToRef(bodyTypeRef), 100); }}
                     className="w-full bg-white/10 text-white rounded p-3 focus:outline-none focus:ring-2 focus:ring-fuchsia-400"
                     required
                   >
@@ -341,8 +359,49 @@ Zustand: ${data.zustand}
                 </div>
               )}
 
-              {/* Kilometerstand */}
+              {/* Karosserieform */}
               {getriebe && (
+                <div ref={bodyTypeRef} className={fadeIn}>
+                  <label className="block mb-2 font-semibold drop-shadow-neon">Karosserieform</label>
+                  <select
+                    value={bodyType}
+                    onChange={(e) => { setBodyType(e.target.value); setTimeout(() => scrollToRef(doorsRef), 100); }}
+                    className="w-full bg-white/10 text-white rounded p-3 focus:outline-none focus:ring-2 focus:ring-fuchsia-400"
+                    required
+                  >
+                    <option value="">Bitte wählen</option>
+                    <option>Kleinwagen</option>
+                    <option>Kombi</option>
+                    <option>Limousine</option>
+                    <option>SUV</option>
+                    <option>Cabrio</option>
+                    <option>Van</option>
+                    <option>Pickup</option>
+                  </select>
+                </div>
+              )}
+
+              {/* Türen */}
+              {bodyType && (
+                <div ref={doorsRef} className={fadeIn}>
+                  <label className="block mb-2 font-semibold drop-shadow-neon">Anzahl der Türen</label>
+                  <select
+                    value={doors}
+                    onChange={(e) => { setDoors(e.target.value); setTimeout(() => scrollToRef(kmRef), 100); }}
+                    className="w-full bg-white/10 text-white rounded p-3 focus:outline-none focus:ring-2 focus:ring-fuchsia-400"
+                    required
+                  >
+                    <option value="">Bitte wählen</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                  </select>
+                </div>
+              )}
+
+              {/* Kilometerstand */}
+              {doors && (
                 <div ref={kmRef} className={fadeIn}>
                   <label className="block mb-2 font-semibold drop-shadow-neon">Kilometerstand</label>
                   <input
@@ -484,6 +543,7 @@ Zustand: ${data.zustand}
           <div ref={additionalTopRef} className="relative z-20 w-full max-w-xl pt-20 animate-fadeInUp">
             <AdditionalQuestions
               onProgress={(fraction) => {
+                // fraction в диапазоне 0..1
                 if (typeof fraction === 'number' && isFinite(fraction)) {
                   setAdditionalFraction(Math.max(0, Math.min(1, fraction)));
                 }
