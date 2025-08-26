@@ -358,7 +358,7 @@ Preisvorstellung: ${data.preis || "nicht angegeben"}
           <div>
             <p className="mb-2">Außenfarbe</p>
             <div className="flex gap-3 flex-wrap">
-              {["Schwarz", "Grau", "Silber", "Weiß", "Blau", "Andere"].map(
+              {["Schwarz", "Grau", "Silber", "Weiß", "Blau", "Rot", "Gelb", "Andere"].map(
                 (val) => (
                   <button
                     key={val}

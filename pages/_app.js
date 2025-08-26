@@ -3,6 +3,7 @@ import '../styles/globals.css'
 import Script from 'next/script'
 import { useEffect } from 'react'
 import { useRouter } from 'next/router'
+import Footer from '../components/Footer'
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID || 'G-X57G2DK9T6'
 
@@ -21,7 +22,7 @@ export default function MyApp({ Component, pageProps }) {
   }, [router.events])
 
   return (
-    <>
+    <div className="min-h-screen flex flex-col bg-[#0f172a]">
       {/* GA4 загрузка */}
       <Script
         strategy="afterInteractive"
@@ -38,7 +39,11 @@ export default function MyApp({ Component, pageProps }) {
         `}
       </Script>
 
-      <Component {...pageProps} />
-    </>
+      <div className="flex-1 flex flex-col">
+        <Component {...pageProps} />
+      </div>
+
+      <Footer />
+    </div>
   )
 }
