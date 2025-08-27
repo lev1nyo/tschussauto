@@ -428,7 +428,6 @@ Zustand: ${data.zustand}
                     <option value="">Bitte wählen</option>
                     <option>Ja</option>
                     <option>Nein</option>
-                    <option>Ich weiß es nicht</option>
                   </select>
                 </div>
               )}
